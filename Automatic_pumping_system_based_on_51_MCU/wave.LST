@@ -1,0 +1,149 @@
+C51 COMPILER V9.54   WAVE                                                                  01/02/2018 10:39:36 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE WAVE
+OBJECT MODULE PLACED IN wave.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil_v5\C51\BIN\C51.EXE wave.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          
+   2          #include <reg51.h>
+   3          #include <intrins.h>  
+   4          #include "lcd12864.h"
+   5          #include "wave.h"
+   6          
+   7          
+   8          unsigned char PuZh[]=" Pechin Science ";
+   9          unsigned char code ASCII[15] =    {'0','1','2','3','4','5','6','7','8','9','.','-','M'};
+  10          
+  11          static unsigned char DisNum = 0; //显示用指针         
+  12          unsigned int  checktime=0;
+  13          unsigned long S=0;
+  14          bit      flag =0;
+  15          unsigned char disbuff[4]={ 0,0,0,0,};
+  16          /*******************************************************************************
+  17          * 函 数 名         : main
+  18          * 函数功能       : 主函数
+  19          * 输    入         : 无
+  20          * 输    出         : 无
+  21          *******************************************************************************/
+  22          void Conut(void)
+  23            {
+  24   1         checktime=TH0*256+TL0;
+  25   1         TH0=0;
+  26   1         TL0=0;
+  27   1        
+  28   1         S=(checktime*1.7)/100;     //算出来是CM
+  29   1         if((S>=700)||flag==1) //超出测量范围显示“-”
+  30   1         {   
+  31   2          flag=0;
+  32   2          LCD12864_ShowString(1,0,"液面:-.--M");
+  33   2      //    LCD12864_WriteData("-.--M");
+  34   2      //    DisplayOneChar(0, 1, ASCII[11]);
+  35   2      //    DisplayOneChar(1, 1, ASCII[10]);  //显示点
+  36   2      //    DisplayOneChar(2, 1, ASCII[11]);
+  37   2      //    DisplayOneChar(3, 1, ASCII[11]);
+  38   2      //    DisplayOneChar(4, 1, ASCII[12]);  //显示M
+  39   2         }
+  40   1         else
+  41   1         {
+  42   2          disbuff[0]=S%1000/100;
+  43   2          disbuff[1]=S%1000%100/10;
+  44   2          disbuff[2]=S%1000%10 %10;
+  45   2           LCD12864_ShowString(1,0,"液面:");
+  46   2          LCD12864_WriteData(ASCII[disbuff[0]]);
+  47   2          LCD12864_WriteData(ASCII[10]);  //显示点
+  48   2          LCD12864_WriteData(ASCII[disbuff[1]]);
+  49   2          LCD12864_WriteData(ASCII[disbuff[2]]);
+  50   2          LCD12864_WriteData(ASCII[12]);  //显示M
+  51   2         }
+  52   1        }
+  53          
+  54          void zd0() interrupt 1     //T0中断用来计数器溢出,超过测距范围
+  55            {
+C51 COMPILER V9.54   WAVE                                                                  01/02/2018 10:39:36 PAGE 2   
+
+  56   1          flag=1;              //中断溢出标志
+  57   1        }
+  58          
+  59           void  StartModule()             //启动模块
+  60            {
+  61   1          Trig=1;                          //启动一次模块
+  62   1          _nop_(); 
+  63   1          _nop_(); 
+  64   1          _nop_(); 
+  65   1          _nop_(); 
+  66   1          _nop_(); 
+  67   1          _nop_(); 
+  68   1          _nop_(); 
+  69   1          _nop_(); 
+  70   1          _nop_(); 
+  71   1          _nop_(); 
+  72   1          _nop_(); 
+  73   1          _nop_(); 
+  74   1          _nop_(); 
+  75   1          _nop_(); 
+  76   1          _nop_(); 
+  77   1          _nop_(); 
+  78   1          _nop_();
+  79   1          _nop_(); 
+  80   1          _nop_(); 
+  81   1          _nop_(); 
+  82   1          _nop_();
+  83   1          Trig=0;
+  84   1        }
+  85          
+  86          
+  87          
+  88          void delayms(unsigned int ms)
+  89          {
+  90   1        unsigned char i=100,j;
+  91   1        for(;ms;ms--)
+  92   1        {
+  93   2          while(--i)
+  94   2          {
+  95   3            j=10;
+  96   3            while(--j);
+  97   3          }
+  98   2        }
+  99   1      }
+ 100          
+ 101          void InitWave()
+ 102          {
+ 103   1         TMOD=0x01;    //设T0为方式1，GATE=1；
+ 104   1         TH0=0;
+ 105   1         TL0=0;          
+ 106   1         ET0=1;        //允许T0中断
+ 107   1         EA=1;         //开启总中断 
+ 108   1      }
+ 109          
+ 110          void showdist(void)
+ 111          {
+ 112   1      //  while(1)
+ 113   1      //  {
+ 114   1           StartModule();
+ 115   1             while(!Echo);    //当RX为零时等待
+ 116   1             TR0=1;         //开启计数
+ 117   1             while(Echo);     //当RX为1计数并等待
+C51 COMPILER V9.54   WAVE                                                                  01/02/2018 10:39:36 PAGE 3   
+
+ 118   1             TR0=0;       //关闭计数
+ 119   1               Conut();     //计算
+ 120   1           delayms(80);
+ 121   1      //  } 
+ 122   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    399    ----
+   CONSTANT SIZE    =     32    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     28    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

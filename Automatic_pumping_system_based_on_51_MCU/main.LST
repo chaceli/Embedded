@@ -1,0 +1,85 @@
+C51 COMPILER V9.54   MAIN                                                                  01/03/2018 01:59:30 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\Program Files\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /*******************************************************************************
+   2          * 项目名称       : 基于51单片机的液位检测装置
+   3          * 使用的IO       : 
+   4          * 实验效果       :按K3进入时钟设置，按K1选择设置的时分秒日月，按K2选择选择设置加1
+   5          * 注意           ：
+   6          *******************************************************************************/
+   7          
+   8          #include <reg51.h>
+   9          #include "lcd12864.h"
+  10          #include "ds1302.h"
+  11          #include "key.h"
+  12          #include "shengbo.h"
+  13          #include "com.h"
+  14          #include "ds18b20.h"
+  15          #include "irlcd.h"
+  16          
+  17          
+  18          /*******************************************************************************
+  19          * 函数名         : main
+  20          * 函数功能       : 主函数
+  21          * 输入           : 无
+  22          * 输出           : 无
+  23          *******************************************************************************/
+  24          
+  25          void main()
+  26          {
+  27   1        LCD12864_Init();    //LCD12864初始化  
+  28   1      //  Ds1302Init();
+  29   1        Timer1Init();
+  30   1        init_t0();
+  31   1        init_measuring();   //超声波相应端口初始化
+  32   1        IrInit();           //IR红外模块初始化
+  33   1        UsartConfiguration();  //初始化串口
+  34   1        Ds18b20Init();         //初始化温度传感器
+  35   1        Int1Init();
+  36   1        while(1)
+  37   1        {
+  38   2          LcdDisplay();
+  39   2          Water_Level();
+  40   2          irlcd();
+  41   2          key();
+  42   2          tempshow();
+  43   2        }
+  44   1      }
+  45          
+  46          void T_0()  interrupt 1
+  47          {
+  48   1          TF0 = 0;
+  49   1          TL0 = 0x66;
+  50   1          TH0 = 0xfc;
+  51   1      
+  52   1          count++;
+  53   1          if(count==18)
+  54   1          {
+  55   2            TR0 =0;
+C51 COMPILER V9.54   MAIN                                                                  01/03/2018 01:59:30 PAGE 2   
+
+  56   2            TL0 = 0x66;
+  57   2            TH0 = 0xfc;
+  58   2            count = 0;
+  59   2          }
+  60   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     76    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

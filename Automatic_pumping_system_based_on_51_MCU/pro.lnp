@@ -1,0 +1,9 @@
+"main.obj",
+"ds1302.obj",
+"lcd12864.obj",
+"shengbo.obj",
+"irlcd.obj",
+"com.obj",
+"ds18b20.obj",
+"key.obj" 
+TO "pro" 
