@@ -1,2 +1,2 @@
 # Embedded
-Automatic pumping system based on 51 single-chip microcomputer
+This repository is about Embedded project including IOT project.
